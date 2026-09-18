@@ -39,7 +39,7 @@ def summarize(events):
     result = []
     for call_id, items in by_call.items():
         messages = " ".join(x["message"] for x in items)
-        codes = [x["kind"] for x in items if re.fullmatch(r"[45]\\d\\d", x["kind"])]
+        codes = [x["kind"] for x in items if re.fullmatch(r"[45]\d\d", x["kind"])]
         result.append({
             "call_id": call_id,
             "event_count": len(items),
