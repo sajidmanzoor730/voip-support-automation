@@ -1,0 +1,59 @@
+{
+  "parsed_events": 17,
+  "calls": [
+    {
+      "call_id": "demo-reg-001",
+      "event_count": 3,
+      "error_codes": [],
+      "has_timeout": false,
+      "has_one_way_audio": false,
+      "methods": [
+        "REGISTER",
+        "401",
+        "REGISTER"
+      ]
+    },
+    {
+      "call_id": "demo-call-1001",
+      "event_count": 5,
+      "error_codes": [],
+      "has_timeout": false,
+      "has_one_way_audio": false,
+      "methods": [
+        "INVITE",
+        "180",
+        "200",
+        "RTP",
+        "BYE"
+      ]
+    },
+    {
+      "call_id": "demo-call-1002",
+      "event_count": 5,
+      "error_codes": [],
+      "has_timeout": false,
+      "has_one_way_audio": true,
+      "methods": [
+        "INVITE",
+        "180",
+        "200",
+        "RTP",
+        "BYE"
+      ]
+    },
+    {
+      "call_id": "demo-reg-002",
+      "event_count": 4,
+      "error_codes": [],
+      "has_timeout": false,
+      "has_one_way_audio": false,
+      "methods": [
+        "REGISTER",
+        "403",
+        "REGISTER",
+        "403"
+      ]
+    }
+  ],
+  "error_code_counts": {}
+}
