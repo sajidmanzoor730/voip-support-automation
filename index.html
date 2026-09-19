@@ -1,20 +1,683 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VoIP Support Automation Toolkit</title>
-<style>
-body{font-family:system-ui,-apple-system,sans-serif;max-width:900px;margin:40px auto;padding:0 20px;line-height:1.6;color:#172033}
-h1{margin-bottom:4px} .muted{color:#64748b}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
-.card{border:1px solid #e2e8f0;border-radius:12px;padding:18px} a{color:#2563eb}
-code{background:#f1f5f9;padding:2px 5px;border-radius:4px}
-</style></head><body>
-<h1>VoIP Support Automation Toolkit</h1>
-<p class="muted">Runnable support-engineering portfolio project — SIP/VoIP, APIs, packet analysis, SQL and ticket automation.</p>
-<div class="grid">
-<div class="card"><h3>Python SIP Parser</h3><p>Parses sanitized SIP support logs and extracts response codes, timeouts and media symptoms.</p><a href="sip-parser/parse_sip_log.py">View parser</a></div>
-<div class="card"><h3>Postman Collection</h3><p>Executable health, authentication and JSON API checks using public HTTP test endpoints.</p><a href="postman/voip-api-health.postman_collection.json">View collection</a></div>
-<div class="card"><h3>Wireshark Filters</h3><p>Reusable SIP, RTP, TCP, DNS and TLS investigation filters.</p><a href="wireshark/voip-filters.md">View filters</a></div>
-<div class="card"><h3>SQL Metrics</h3><p>Queries for MOS, packet loss, jitter, setup latency and issue distribution.</p><a href="sql/voip_metrics.sql">View SQL</a></div>
-</div>
-<h2>Data integrity</h2>
-<p>All included call records are synthetic test data. They are clearly separated from real employment metrics and contain no customer information.</p>
-</body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>VoIP Support Automation Toolkit</title>
+
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: #0d1b2a;
+      --panel-light: #12263a;
+      --line: #20344b;
+      --text: #e8eef7;
+      --muted: #8ea2b8;
+      --accent: #55b6ff;
+      --success: #54d18b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #07111f, #0b1524);
+      color: var(--text);
+      font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      line-height: 1.6;
+    }
+
+    main {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 45px 22px 70px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 8px 0 8px;
+      font-size: 38px;
+      line-height: 1.2;
+    }
+
+    h2 {
+      margin: 0 0 15px;
+      font-size: 22px;
+    }
+
+    h3 {
+      margin-top: 0;
+    }
+
+    .subtitle {
+      max-width: 800px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .source-note {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      background: rgba(13, 27, 42, 0.8);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .source-note strong {
+      color: var(--text);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 30px 0;
+    }
+
+    .metric {
+      background: rgba(13, 27, 42, 0.95);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .metric-value {
+      font-size: 27px;
+      font-weight: 750;
+      line-height: 1.2;
+    }
+
+    .metric-label {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    section {
+      margin-top: 32px;
+    }
+
+    .panel {
+      overflow: hidden;
+      background: rgba(13, 27, 42, 0.95);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 13px 15px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 650;
+      background: rgba(18, 38, 58, 0.7);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border: 1px solid #31506e;
+      border-radius: 999px;
+      color: #9fd4ff;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .verified {
+      color: var(--success);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .card {
+      background: rgba(13, 27, 42, 0.95);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: #12263a;
+      color: #b9ddff;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-note {
+      margin-top: 30px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 850px) {
+      .metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<main>
+
+  <!-- Header -->
+  <div class="eyebrow">
+    Support Engineering • Evidence Workspace
+  </div>
+
+  <h1>VoIP Support Automation Toolkit</h1>
+
+  <p class="subtitle">
+    A practical VoIP support-engineering toolkit for investigating
+    SIP, RTP, signaling, media, API, and network issues using
+    structured evidence and repeatable troubleshooting workflows.
+  </p>
+
+  <!-- Data provenance -->
+  <div class="source-note">
+    <strong>Data provenance:</strong>
+    This project uses publicly available Wireshark VoIP sample captures
+    and documented RTP statistics. The evidence shown here is not
+    customer data, employer data, carrier data, or production telemetry.
+  </div>
+
+
+  <!-- Key metrics -->
+  <section>
+
+    <div class="metrics">
+
+      <div class="metric">
+        <div class="metric-value">8</div>
+        <div class="metric-label">
+          Public VoIP capture artifacts indexed
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-value">3</div>
+        <div class="metric-label">
+          Verified RTP frames in measurement set
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-value">1.029 ms</div>
+        <div class="metric-label">
+          Documented RTP interarrival jitter
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-value">G.711</div>
+        <div class="metric-label">
+          Verified RTP payload family
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- Capture inventory -->
+  <section>
+
+    <h2>Public VoIP Evidence Inventory</h2>
+
+    <div class="panel">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Capture</th>
+            <th>Protocol / Media</th>
+            <th>Evidence Type</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr>
+            <td><strong>aaa.pcap</strong></td>
+            <td>SIP + RTP</td>
+            <td>
+              <span class="badge">Public Capture</span>
+            </td>
+            <td>
+              <a
+                href="https://wiki.wireshark.org/SampleCaptures"
+                target="_blank"
+                rel="noopener"
+              >
+                Wireshark
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td><strong>SIP_CALL_RTP_G711</strong></td>
+            <td>SIP + RTP + G.711</td>
+            <td>
+              <span class="badge">Public Capture</span>
+            </td>
+            <td>
+              <a
+                href="https://wiki.wireshark.org/SampleCaptures"
+                target="_blank"
+                rel="noopener"
+              >
+                Wireshark
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td><strong>SIP_DTMF2.cap</strong></td>
+            <td>SIP + RTP + DTMF</td>
+            <td>
+              <span class="badge">Public Capture</span>
+            </td>
+            <td>
+              <a
+                href="https://wiki.wireshark.org/SampleCaptures"
+                target="_blank"
+                rel="noopener"
+              >
+                Wireshark
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td><strong>DTMFsipinfo.pcap</strong></td>
+            <td>SIP + DTMF / SIP INFO</td>
+            <td>
+              <span class="badge">Public Capture</span>
+            </td>
+            <td>
+              <a
+                href="https://wiki.wireshark.org/SampleCaptures"
+                target="_blank"
+                rel="noopener"
+              >
+                Wireshark
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td><strong>sip-rtp-g711.pcap</strong></td>
+            <td>SIP + RTP + G.711</td>
+            <td>
+              <span class="badge">Public Capture</span>
+            </td>
+            <td>
+              <a
+                href="https://wiki.wireshark.org/SampleCaptures"
+                target="_blank"
+                rel="noopener"
+              >
+                Wireshark
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td><strong>sip-rtp-g722.pcap</strong></td>
+            <td>SIP + RTP + G.722</td>
+            <td>
+              <span class="badge">Public Capture</span>
+            </td>
+            <td>
+              <a
+                href="https://wiki.wireshark.org/SampleCaptures"
+                target="_blank"
+                rel="noopener"
+              >
+                Wireshark
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td><strong>sip-rtp-opus.pcap</strong></td>
+            <td>SIP + RTP + Opus</td>
+            <td>
+              <span class="badge">Public Capture</span>
+            </td>
+            <td>
+              <a
+                href="https://wiki.wireshark.org/SampleCaptures"
+                target="_blank"
+                rel="noopener"
+              >
+                Wireshark
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td><strong>sip-tls-1.3-and-rtcp.zip</strong></td>
+            <td>SIP/TLS + RTCP</td>
+            <td>
+              <span class="badge">Public Capture</span>
+            </td>
+            <td>
+              <a
+                href="https://wiki.wireshark.org/SampleCaptures"
+                target="_blank"
+                rel="noopener"
+              >
+                Wireshark
+              </a>
+            </td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+
+  <!-- RTP measurement -->
+  <section>
+
+    <h2>Verified RTP Measurement</h2>
+
+    <div class="panel">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Frame</th>
+            <th>Capture Time</th>
+            <th>RTP Timestamp</th>
+            <th>Payload</th>
+            <th>Clock</th>
+            <th>Jitter</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr>
+            <td>624</td>
+            <td>11:56:25.348411</td>
+            <td>1240</td>
+            <td>G.711 PCMA (8)</td>
+            <td>8000 Hz</td>
+            <td>0.000 ms</td>
+          </tr>
+
+          <tr>
+            <td>625</td>
+            <td>11:56:25.418358</td>
+            <td>1400</td>
+            <td>G.711 PCMA (8)</td>
+            <td>8000 Hz</td>
+            <td>0.000 ms</td>
+          </tr>
+
+          <tr>
+            <td>626</td>
+            <td>11:56:25.421891</td>
+            <td>1560</td>
+            <td>G.711 PCMA (8)</td>
+            <td>8000 Hz</td>
+            <td class="verified">1.029 ms</td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+
+  <!-- Investigation workflow -->
+  <section>
+
+    <h2>Support Investigation Workflow</h2>
+
+    <div class="grid">
+
+      <div class="card">
+        <h3>1. SIP Signaling</h3>
+
+        <p>
+          Inspect INVITE, response codes, registration,
+          authentication, call setup and termination.
+        </p>
+
+        <p>
+          Example filter:
+          <code>sip</code>
+        </p>
+      </div>
+
+
+      <div class="card">
+        <h3>2. RTP Media</h3>
+
+        <p>
+          Check RTP streams, packet sequence, timing,
+          payload type, jitter and media direction.
+        </p>
+
+        <p>
+          Example filter:
+          <code>rtp</code>
+        </p>
+      </div>
+
+
+      <div class="card">
+        <h3>3. Network Layer</h3>
+
+        <p>
+          Investigate TCP retransmissions, DNS behavior,
+          routing, NAT and possible firewall-related symptoms.
+        </p>
+
+        <p>
+          Example:
+          <code>tcp.analysis.retransmission</code>
+        </p>
+      </div>
+
+
+      <div class="card">
+        <h3>4. API Integration</h3>
+
+        <p>
+          Validate HTTP status codes, authentication,
+          authorization, request payloads and response data.
+        </p>
+
+        <p>
+          Example:
+          <code>401</code> vs <code>403</code>
+        </p>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- Project components -->
+  <section>
+
+    <h2>Toolkit Components</h2>
+
+    <div class="grid">
+
+      <div class="card">
+        <h3>Python SIP Parser</h3>
+
+        <p>
+          Parses structured SIP support logs and extracts
+          signaling events, response codes and media symptoms.
+        </p>
+
+        <a href="sip-parser/parse_sip_log.py">
+          View parser →
+        </a>
+      </div>
+
+
+      <div class="card">
+        <h3>SQL Investigation</h3>
+
+        <p>
+          Queries the evidence inventory and RTP measurement
+          dataset for repeatable support analysis.
+        </p>
+
+        <a href="sql/voip_metrics.sql">
+          View SQL →
+        </a>
+      </div>
+
+
+      <div class="card">
+        <h3>Wireshark Filters</h3>
+
+        <p>
+          Practical SIP, RTP, DNS, TCP and TLS filters
+          for packet-level investigation.
+        </p>
+
+        <a href="wireshark/voip-filters.md">
+          View filters →
+        </a>
+      </div>
+
+
+      <div class="card">
+        <h3>Ticket Automation</h3>
+
+        <p>
+          JIRA and Zendesk triage design for categorizing
+          VoIP incidents and preparing escalation packages.
+        </p>
+
+        <a href="automation/jira-zendesk-blueprint.md">
+          View automation blueprint →
+        </a>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- Footer -->
+  <section>
+
+    <div class="source-note">
+
+      <strong>Evidence integrity:</strong>
+
+      The public capture inventory and RTP measurements are
+      sourced from Wireshark documentation. The SIP parser
+      fixture is included only to demonstrate parsing logic.
+
+      No customer records, private credentials, employer
+      network information, or production monitoring data
+      are represented in this portfolio.
+
+    </div>
+
+    <p class="footer-note">
+      VoIP Support Automation Toolkit • Built for
+      support engineering, troubleshooting and technical operations.
+    </p>
+
+  </section>
+
+</main>
+
+</body>
+</html>
