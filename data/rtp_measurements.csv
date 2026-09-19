@@ -1,0 +1,4 @@
+source_capture,stream_ssrc,frame_number,frame_time,rtp_timestamp,payload_type,sampling_hz,delta_seconds,delta_timestamp_seconds,transit_difference_seconds,jitter_ms,source_url
+aaa.pcap,932629361,624,Jul 4 2005 11:56:25.348411000,1240,ITU-T G.711 PCMA (8),8000,,,0,0,https://wiki.wireshark.org/RTP_statistics
+aaa.pcap,932629361,625,Jul 4 2005 11:56:25.418358000,1400,ITU-T G.711 PCMA (8),8000,0.069947,0.020000,0.049947,0,https://wiki.wireshark.org/RTP_statistics
+aaa.pcap,932629361,626,Jul 4 2005 11:56:25.421891000,1560,ITU-T G.711 PCMA (8),8000,0.003533,0.020000,-0.016467,1.0291875,https://wiki.wireshark.org/RTP_statistics
