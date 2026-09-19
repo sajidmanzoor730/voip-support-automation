@@ -1,0 +1,30 @@
+{
+  "info": {
+    "name": "VoIP API Health Check - Support Automation",
+    "description": "Automated collection for L1/L2 troubleshooting of SIP & Call Log APIs"
+  },
+  "item": [
+    {
+      "name": "Check Auth Token",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/auth/validate",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+      }
+    },
+    {
+      "name": "Check SIP Registration Status",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/sip/registration?user={{sip_user}}"
+      }
+    },
+    {
+      "name": "Check Call Logs API",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/calls?from={{date}}"
+      }
+    }
+  ]
+}
