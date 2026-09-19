@@ -1,38 +1,45 @@
--- Run after schema.sql.
+-- Evidence-backed queries. These operate on public capture metadata
+-- and the packet-level RTP example reproduced from Wireshark documentation.
+
 .headers on
 .mode column
 
--- 1. Overall quality metrics
+-- 1. Public VoIP evidence inventory
 SELECT
-  COUNT(*) AS calls,
-  ROUND(AVG(mos), 2) AS avg_mos,
-  ROUND(AVG(packet_loss_pct), 2) AS avg_packet_loss_pct,
-  ROUND(AVG(jitter_ms), 2) AS avg_jitter_ms,
-  ROUND(AVG(setup_ms), 0) AS avg_setup_ms
-FROM call_records;
+  protocol_scope,
+  COUNT(*) AS capture_artifacts
+FROM capture_inventory
+GROUP BY protocol_scope
+ORDER BY capture_artifacts DESC;
 
--- 2. Calls needing investigation
-SELECT call_id, mos, packet_loss_pct, jitter_ms, setup_ms, issue_category
-FROM call_records
-WHERE mos < 3.5
-   OR packet_loss_pct >= 2.0
-   OR jitter_ms >= 15
-   OR setup_ms >= 250
-ORDER BY mos ASC;
+-- 2. Capture records suitable for SIP/RTP investigation
+SELECT capture_name, protocol_scope, description
+FROM capture_inventory
+WHERE protocol_scope LIKE '%SIP%'
+   OR protocol_scope LIKE '%RTP%'
+ORDER BY capture_name;
 
--- 3. Issue distribution
-SELECT issue_category, COUNT(*) AS incidents
-FROM call_records
-GROUP BY issue_category
-ORDER BY incidents DESC;
+-- 3. Verified packet-level RTP measurements
+SELECT
+  source_capture,
+  stream_ssrc,
+  frame_number,
+  frame_time,
+  rtp_timestamp,
+  payload_type,
+  sampling_hz,
+  ROUND(jitter_ms, 3) AS jitter_ms
+FROM rtp_measurements
+ORDER BY frame_number;
 
--- 4. Repeat pattern: one-way audio
-SELECT call_id, duration_sec, mos, packet_loss_pct, jitter_ms
-FROM call_records
-WHERE issue_category = 'one_way_audio';
+-- 4. Maximum measured jitter in the documented example
+SELECT
+  source_capture,
+  ROUND(MAX(jitter_ms), 3) AS max_measured_jitter_ms
+FROM rtp_measurements
+GROUP BY source_capture;
 
--- 5. High setup latency
-SELECT call_id, setup_ms, termination
-FROM call_records
-WHERE setup_ms >= 250
-ORDER BY setup_ms DESC;
+-- 5. Evidence records with an external provenance link
+SELECT capture_name, evidence_type, source_url
+FROM capture_inventory
+ORDER BY capture_name;
