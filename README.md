@@ -1,44 +1,65 @@
 # VoIP Support Automation Toolkit
 
-A practical, runnable support-engineering portfolio project for diagnosing common SIP/VoIP, API, network, and ticketing issues.
+A support-engineering toolkit for investigating SIP/VoIP incidents using packet evidence, structured analysis, SQL, API checks, and ticket-triage logic.
 
-## What is real here?
+## Evidence model
 
-The artifacts are real, executable examples:
-- The Python SIP log parser actually parses the included sample log and produces a JSON summary.
-- The Postman collection contains executable API checks against `https://httpbin.org`.
-- The SQL queries run against the included SQLite dataset.
-- The Wireshark filters are valid display-filter examples.
-- The JIRA/Zendesk material is an implementation blueprint, not a claim of access to those systems.
+The dashboard no longer uses invented call-quality metrics as if they were operational history.
 
-## Important data note
+The primary evidence set is based on **public Wireshark VoIP sample captures and documented packet-level observations**. Wireshark publishes SIP/RTP captures such as `aaa.pcap`, `SIP_CALL_RTP_G711`, `SIP_DTMF2.cap`, multiple codec-specific SIP/RTP captures, and a SIP/TLS 1.3 + RTCP capture. citeturn0search0turn1search0
 
-The included call records and SIP logs are **synthetic test data**, deliberately created for a public portfolio. They do not represent a real customer, company, carrier, phone number, IP address, or production incident. Metrics in the project are calculated from this test dataset and must not be presented as historical employer results.
+The repository also records a verified RTP-analysis example from Wireshark's documentation: stream SSRC `932629361`, frames 624–626, G.711 PCMA payload type 8, with the documented packet timestamps and a calculated second-step interarrival jitter of approximately **1.029 ms**. citeturn1search5
 
-## Structure
+These are **public research/sample captures, not customer or employer production data**. No claim is made that they represent Sajid's employment history or a live telecom environment.
 
-- `postman/voip-api-health.postman_collection.json` — API health checks
-- `wireshark/voip-filters.md` — practical SIP/RTP/DNS/TCP filters
-- `sip-parser/parse_sip_log.py` — working SIP log parser
-- `sip-parser/sample_sip.log` — test input
-- `sql/schema.sql` — SQLite schema + seed data
-- `sql/voip_metrics.sql` — support metrics and investigation queries
-- `data/call_records.csv` — synthetic call-quality dataset
-- `automation/jira-zendesk-blueprint.md` — ticket automation design
-- `docs/incident-runbook.md` — end-to-end troubleshooting workflow
+## What is executable
+
+- Python SIP parser for sanitized log fixtures.
+- SQL evidence tables and investigation queries.
+- Evidence-backed capture inventory.
+- Packet-level RTP measurement example with reproducible calculations.
+- Wireshark filters for SIP/RTP/DNS/TCP investigation.
+- API health checks through Postman.
+- JIRA/Zendesk triage blueprint.
+- Incident runbook connecting symptoms to evidence and escalation.
+
+## Data
+
+- `data/public_capture_inventory.csv` — public Wireshark capture catalog used by the project.
+- `data/rtp_measurements.csv` — packet-level values reproduced from the documented Wireshark RTP statistics example.
+- `data/source_notes.md` — provenance and interpretation notes.
+- `sip-parser/sample_sip.log` — small parser fixture only; it is not used for dashboard metrics.
+
+## How the evidence pipeline is intended to work
+
+```
+PCAP
+  -> Wireshark / TShark
+  -> SIP + SDP + RTP fields
+  -> structured evidence
+  -> SQL
+  -> incident classification
+  -> support/RCA output
+```
+
+Wireshark's VoIP analysis exposes call timing, SIP information and RTP stream details; its RTP analysis reports packet ordering and jitter-related information. citeturn4search7turn0search2
 
 ## Quick start
 
-### Run the SIP parser
+### Parser fixture
 ```bash
 python3 sip-parser/parse_sip_log.py sip-parser/sample_sip.log
 ```
 
-### Run the SQL dashboard queries
+### Evidence SQL
 ```bash
 sqlite3 voip.db < sql/schema.sql
 sqlite3 voip.db < sql/voip_metrics.sql
 ```
 
 ### Postman
-Import the collection into Postman and run the collection. It uses public HTTP test endpoints and does not require credentials.
+Import `postman/voip-api-health.postman_collection.json` into Postman and run the collection. It uses public HTTP test endpoints and does not require credentials.
+
+## Important integrity rule
+
+Do not present the public capture evidence as customer traffic, live production telemetry, or employment results. The dashboard deliberately labels the provenance of each evidence record.
