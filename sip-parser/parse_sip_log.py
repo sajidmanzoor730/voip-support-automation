@@ -78,6 +78,36 @@ def parse_log(path: str | Path) -> dict:
                 "Confirm digest challenge/response sequence",
                 "Verify credentials if authentication does not complete",
             ]
+        elif 407 in codes:
+            call["classification"] = "PROXY_AUTH_CHALLENGE"
+            call["recommended_checks"] = [
+                "Confirm proxy authentication challenge and retry",
+                "Check proxy credentials and Proxy-Authorization handling",
+            ]
+        elif 408 in codes:
+            call["classification"] = "REQUEST_TIMEOUT"
+            call["recommended_checks"] = [
+                "Check transaction timers and response path",
+                "Review packet loss, routing and remote endpoint availability",
+            ]
+        elif 486 in codes:
+            call["classification"] = "CALL_REJECTED_BUSY"
+            call["recommended_checks"] = [
+                "Confirm destination user/device availability",
+                "Check whether call forwarding or busy policy is expected",
+            ]
+        elif 488 in codes:
+            call["classification"] = "SDP_MEDIA_NEGOTIATION_FAILURE"
+            call["recommended_checks"] = [
+                "Compare SDP offer and answer codec lists",
+                "Check media profile, transport and required SDP attributes",
+            ]
+        elif 503 in codes:
+            call["classification"] = "SERVICE_UNAVAILABLE"
+            call["recommended_checks"] = [
+                "Check service health and upstream dependency status",
+                "Review Retry-After if present; avoid uncontrolled retry loops",
+            ]
         elif call["has_timeout"]:
             call["classification"] = "MEDIA_TIMEOUT"
             call["recommended_checks"] = [
