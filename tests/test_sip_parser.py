@@ -25,6 +25,26 @@ class SipParserTests(unittest.TestCase):
         self.assertEqual(report["malformed_lines"], 1)
         self.assertEqual(report["calls"], [])
 
+    def test_additional_sip_responses_are_classified(self):
+        cases = {
+            "407": "PROXY_AUTH_CHALLENGE",
+            "408": "REQUEST_TIMEOUT",
+            "486": "CALL_REJECTED_BUSY",
+            "488": "SDP_MEDIA_NEGOTIATION_FAILURE",
+            "503": "SERVICE_UNAVAILABLE",
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            log = Path(tmp) / "responses.log"
+            lines = [
+                f"2026-09-15 11:00:0{i} WARN {code} call_id=case-{code} test response"
+                for i, code in enumerate(cases, start=1)
+            ]
+            log.write_text("\\n".join(lines) + "\\n", encoding="utf-8")
+            report = parse_log(log)
+        actual = {item["call_id"].replace("case-", ""): item["classification"]
+                  for item in report["calls"]}
+        self.assertEqual(actual, cases)
+
     def test_401_challenge_is_not_misreported_as_failure(self):
         with tempfile.TemporaryDirectory() as tmp:
             log = Path(tmp) / "auth.log"
