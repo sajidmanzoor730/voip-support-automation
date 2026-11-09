@@ -81,6 +81,28 @@ Add once you have them:
 - Likely cause and next step: [conclusion and escalation]
 -->
 
+
+## Run automated tests
+
+The parser uses only the Python standard library.
+
+```bash
+python3 sip-parser/parse_sip_log.py sip-parser/sample_sip.log --json sip-parser/report.json
+python3 -m unittest discover -s tests -v
+python3 validate_project.py
+```
+
+The parser output classifies the synthetic fixture events and can write a JSON report. The tests cover the known fixture scenarios, malformed lines, and the distinction between a SIP 401 digest challenge and a confirmed registration failure.
+
+## Worked incident investigations
+
+See [docs/worked-incidents.md](docs/worked-incidents.md) for three walkthroughs:
+- SIP 403 registration rejection
+- One-way audio reported after call answer
+- SIP 401 digest challenge followed by an accepted registration
+
+Each case separates what the fixture actually proves from the additional evidence an engineer must collect before declaring a root cause.
+
 ## Integrity note
 
 This is a learning and portfolio project. Public sample captures are not presented as customer traffic, production telemetry, or work results.
