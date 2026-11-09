@@ -27,7 +27,7 @@ All evidence in this repository comes from **public Wireshark sample captures** 
 | Packet analysis | `wireshark/` | Display filters for SIP, RTP, DNS, and TCP investigation |
 | API health checks | `postman/` | Postman collection using public HTTP test endpoints (no credentials needed) |
 | Evidence data | `data/` | Capture inventory, RTP measurements, and source notes |
-| Runbook and triage | `docs/` | Incident runbook (symptom → evidence → escalation) and a Jira/Zendesk triage blueprint |
+| Runbook and triage | `docs/` | Incident runbook, worked incidents, API/SMS troubleshooting, and a Jira/Zendesk triage blueprint |
 | Validation | `validate_project.py` | Checks that project files and data are consistent |
 
 ## How the evidence pipeline works
@@ -102,6 +102,10 @@ See [docs/worked-incidents.md](docs/worked-incidents.md) for three walkthroughs:
 - SIP 401 digest challenge followed by an accepted registration
 
 Each case separates what the fixture actually proves from the additional evidence an engineer must collect before declaring a root cause.
+
+## REST API and SMS troubleshooting
+
+See [docs/api-sms-troubleshooting.md](docs/api-sms-troubleshooting.md) for HTTP/API triage, safe retry guidance, SMS lifecycle interpretation, delivery callback checks, and simulated support cases. The guide distinguishes an API request being accepted from a message being delivered.
 
 ## Integrity note
 
