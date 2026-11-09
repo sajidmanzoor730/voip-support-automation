@@ -20,6 +20,7 @@ REQUIRED = [
     "automation/jira-zendesk-blueprint.md",
     "docs/incident-runbook.md",
     "docs/worked-incidents.md",
+    "docs/api-sms-troubleshooting.md",
     "tests/test_sip_parser.py",
 ]
 missing = [name for name in REQUIRED if not (ROOT / name).is_file()]
