@@ -39,7 +39,7 @@ class SipParserTests(unittest.TestCase):
                 f"2026-09-15 11:00:0{i} WARN {code} call_id=case-{code} test response"
                 for i, code in enumerate(cases, start=1)
             ]
-            log.write_text("\\n".join(lines) + "\\n", encoding="utf-8")
+            log.write_text("\n".join(lines) + "\n", encoding="utf-8")
             report = parse_log(log)
         actual = {item["call_id"].replace("case-", ""): item["classification"]
                   for item in report["calls"]}
