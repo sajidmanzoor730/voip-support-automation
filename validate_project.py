@@ -1,25 +1,59 @@
 #!/usr/bin/env python3
+"""Check required project assets and run the SIP parser and unit tests."""
 from pathlib import Path
-import csv, json, subprocess, sys
+import csv
+import subprocess
+import sys
 
-root = Path(__file__).resolve().parent
-required = [
-    root/"README.md",
-    root/"postman/voip-api-health.postman_collection.json",
-    root/"wireshark/voip-filters.md",
-    root/"sip-parser/parse_sip_log.py",
-    root/"sip-parser/sample_sip.log",
-    root/"sql/schema.sql",
-    root/"sql/voip_metrics.sql",
-    root/"data/call_records.csv",
-    root/"automation/jira-zendesk-blueprint.md",
+ROOT = Path(__file__).resolve().parent
+REQUIRED = [
+    "README.md",
+    "postman/voip-api-health.postman_collection.json",
+    "wireshark/voip-filters.md",
+    "sip-parser/parse_sip_log.py",
+    "sip-parser/sample_sip.log",
+    "sql/schema.sql",
+    "sql/voip_metrics.sql",
+    "data/public_capture_inventory.csv",
+    "data/rtp_measurements.csv",
+    "data/source_notes.md",
+    "automation/jira-zendesk-blueprint.md",
+    "docs/incident-runbook.md",
+    "docs/worked-incidents.md",
+    "tests/test_sip_parser.py",
 ]
-missing = [str(p.relative_to(root)) for p in required if not p.exists()]
+missing = [name for name in REQUIRED if not (ROOT / name).is_file()]
 if missing:
-    print("Missing:", missing)
+    print("Missing required project files:")
+    for name in missing:
+        print(f"  - {name}")
     raise SystemExit(1)
 
-rows = list(csv.DictReader((root/"data/call_records.csv").open()))
-print(f"Validation OK: {len(rows)} synthetic call records found.")
-print("Running SIP parser...")
-subprocess.run([sys.executable, str(root/"sip-parser/parse_sip_log.py"), str(root/"sip-parser/sample_sip.log")], check=True)
+with (ROOT / "data/public_capture_inventory.csv").open(
+    newline="", encoding="utf-8"
+) as handle:
+    capture_rows = list(csv.DictReader(handle))
+with (ROOT / "data/rtp_measurements.csv").open(
+    newline="", encoding="utf-8"
+) as handle:
+    rtp_rows = list(csv.DictReader(handle))
+
+print(f"Required files present: {len(REQUIRED)}")
+print(f"Public capture inventory rows: {len(capture_rows)}")
+print(f"Documented RTP measurement rows: {len(rtp_rows)}")
+
+print("\nRunning SIP parser...")
+subprocess.run(
+    [sys.executable, "sip-parser/parse_sip_log.py", "sip-parser/sample_sip.log"],
+    cwd=ROOT,
+    check=True,
+)
+
+print("\nRunning unit tests...")
+subprocess.run(
+    [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"],
+    cwd=ROOT,
+    check=True,
+)
+
+print("\nProject validation passed.")
