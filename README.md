@@ -82,6 +82,11 @@ Add once you have them:
 -->
 
 
+## Visual workflow and reproducible demo
+
+- [VoIP investigation workflow diagram](docs/voip-investigation-workflow.svg)
+- [Reproducible SIP parser demo](docs/reproducible-demo.md) — run commands, interpret the fixture output, and prepare an evidence-led support handoff.
+
 ## Run automated tests
 
 The parser uses only the Python standard library.
